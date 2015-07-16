@@ -2,8 +2,10 @@ import java.util.*;
 
 public class ExpertSystemShell {
 	
+	private HashMap<Variable, Boolean> knownFacts;
+	
 	public ExpertSystemShell() {
-		
+		knownFacts = new HashMap<Variable, Boolean>();
 	}
 	
 	//determines which command to run

@@ -1,34 +1,19 @@
 public class Variable {
 	private String name, expression;
-	private boolean isRoot;
+	private boolean isRoot, state;
 	
 	public Variable() {
 		name = "";
 		expression = "";
 		isRoot = false;
+		state = false;
 	}
 	
-	public Variable(boolean isRoot, String name, String expression) {
+	public Variable(boolean isRoot, String name, String expression, boolean state) {
 		this.isRoot = isRoot;
 		this.name = name;
 		this.expression = expression;
-	}
-	
-	/**
-	 *Overriding the default way in which this item is put into a hash map so that the items are stored by their name instead of their instance
-	 */
-	 @Override
-	public int hashCode() {
-		return name.hashCode();
-	}
-	
-	/**
-	 *Overriding the default way in which this item determines equality, this will compare against names, not instances
-	 */
-	 @Override
-	public boolean equals(Object obj) {
-		Variable otherVar = (Variable) obj;
-		return name.equals(otherVar.getName());
+		this.state = state;
 	}
 	
 	public void setIsRoot(boolean isRoot) {
@@ -53,5 +38,13 @@ public class Variable {
 	
 	public String getExpression() {
 		return expression;
+	}
+	
+	public boolean getState() {
+		return state;
+	}
+	
+	public void setState(boolean state) {
+		this.state = state;
 	}
 }

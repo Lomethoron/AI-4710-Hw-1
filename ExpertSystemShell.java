@@ -2,28 +2,49 @@ import java.util.*;
 
 public class ExpertSystemShell {
 	
-	private HashMap<Variable, Boolean> knownFacts; // in retrospect this is really stupid, it should be <String (name), Variable (var)>
+	private HashMap<String, Variable> knownFacts;
 	
 	public ExpertSystemShell() {
-		knownFacts = new HashMap<Variable, Boolean>();
+		knownFacts = new HashMap<String, Variable>();
 	}
 	
 	//determines which command to run
-	private boolean exec(String[] parsedUserCommand) { //this may end up returning a void
+	private boolean exec(String userCommand) { //this may end up returning a void
+		String[] parsedUserCommand = userCommand.split("\\W");
 		//switch or if/else list of each command
 		if(parsedUserCommand[0].matches("quit|q|exit|ex|e")) {
 			System.exit(0);
 		}
-		//for teach -args..., the dash is treated as its own place to break the string using .split(), this makes these numbers 1 larger than one might think
-		else if (parsedUserCommand[0].equalsIgnoreCase("teach")&& parsedUserCommand.length == 5) {
-			teach(parsedUserCommand[2], parsedUserCommand[3], parsedUserCommand[4]);
+		else if (parsedUserCommand[0].equalsIgnoreCase("teach")) {
+			//first teach command, for some reason I elected not to use the method below here
+			if(userCommand.charAt(6) == '-'){
+				boolean isRoot = false;
+				if(userCommand.charAt(7) == 'r' || userCommand.charAt(7) == 'R') {
+					isRoot = true;
+				}
+				String varAndExpressionSubstring = userCommand.substring(9); //trim off the front of the string
+				String[] varAndExpressionSplit = varAndExpressionSubstring.split(" = ");
+				varAndExpressionSplit[1] = varAndExpressionSplit[1].substring(1,varAndExpressionSplit[1].length()-1); //remove the quotations
+				System.out.println("a"+varAndExpressionSplit[0]+"a");
+				
+				Variable newVar = new Variable(isRoot, varAndExpressionSplit[0], varAndExpressionSplit[1], false);
+				knownFacts.put(varAndExpressionSplit[0], newVar);
+			}
+			//second teach command
+			else if(userCommand.contains("=")){
+				String varAndExpressionSubstring = userCommand.substring(6);
+				//System.out.println(varAndExpressionSubstring);
+				String[] varAndExpressionSplit = varAndExpressionSubstring.split(" = ");
+				//System.out.println("a"+varAndExpressionSplit[1]+"a");
+				teach(varAndExpressionSplit[0], Boolean.parseBoolean(varAndExpressionSplit[1]));
+				
+				
+			}
+			//final teach command
+			else {
+				
+			}
 		}	
-		else if(parsedUserCommand[0].equalsIgnoreCase("teach")&& (parsedUserCommand[2].equalsIgnoreCase("true")||parsedUserCommand[2].equalsIgnoreCase("false"))){
-			teach(parsedUserCommand[1], Boolean.parseBoolean(parsedUserCommand[2]));
-		}
-		else if(parsedUserCommand[0].equalsIgnoreCase("teach")){
-			teach(parsedUserCommand[1], parsedUserCommand[2]);
-		}
 		else if (parsedUserCommand[0].equalsIgnoreCase("list")) {
 			list();
 		}
@@ -44,8 +65,8 @@ public class ExpertSystemShell {
 		if (arg.equalsIgnoreCase("r")) {
 			isRoot = true;
 		}
-		Variable newVar = new Variable(isRoot, var, expression);
-		knownFacts.put(newVar, true); //need to look up specified behaviour here
+		//Variable newVar = new Variable(isRoot, var, expression);
+		//knownFacts.put(newVar, false); //need to look up specified behaviour here
 		return true;
 	}
 	
@@ -53,13 +74,11 @@ public class ExpertSystemShell {
 	 *Teaches the system that a defined root variable has been observed to be true(or false). 
 	 */
 	private boolean teach(String var, boolean truth) {
-		for(Map.Entry<Variable, Boolean> entry: knownFacts.entrySet()){ //need to grab the entire key object
-			if(var.equals(entry.getKey().getName())) {
-				knownFacts.put(entry.getKey(), truth);
-				return true;
-			}
-		}
-		return false;
+		System.out.println(truth);
+		Variable editVar = knownFacts.get(var);
+		editVar.setState(truth);
+		knownFacts.put(var, editVar);
+		return true;
 	}
 	
 	/**
@@ -74,8 +93,8 @@ public class ExpertSystemShell {
 	 * Lists out all of the fact and rules currently known by the system.
 	 */
 	private String list() {
-		for(Map.Entry<Variable, Boolean> entry: knownFacts.entrySet()){
-			System.out.println("The value of: "+entry.getKey().getName()+" is: "+entry.getValue());
+		for(Map.Entry<String, Variable> entry: knownFacts.entrySet()){
+			System.out.println("The value of: "+entry.getKey()+" is: "+entry.getValue().getExpression()+" and is currently: "+entry.getValue().getState());
 		}
 		return "";
 	}
@@ -102,9 +121,8 @@ public class ExpertSystemShell {
 		Scanner in = new Scanner(System.in);
 		while(true){
 			String userCommand = in.nextLine();
-			String[] parsedUserCommand = userCommand.split("\\W");
 			//System.out.println("Command length: "+parsedUserCommand.length+" First token: "+parsedUserCommand[0]);
-			program.exec(parsedUserCommand);
+			program.exec(userCommand);
 		}
 	}
 }

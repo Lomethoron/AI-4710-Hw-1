@@ -9,10 +9,21 @@ public class ExpertSystemShell {
 	}
 	
 	//determines which command to run
-	private boolean exec(String userCommand) { //this may end up returning a void
+	private boolean exec(String[] parsedUserCommand) { //this may end up returning a void
 		//switch or if/else list of each command
-		if(userCommand.matches("quit|q|exit|ex|e")) {
+		if(parsedUserCommand[0].matches("quit|q|exit|ex|e")) {
 			System.exit(0);
+		}
+		//for teach -args..., the dash is treated as its own place to break the string using .split(), this makes these numbers 1 larger than one might think
+		else if (parsedUserCommand[0].equalsIgnoreCase("teach")&& parsedUserCommand.length == 5) {
+			System.out.println("Big teach triggered");
+			teach(parsedUserCommand[2], parsedUserCommand[3], parsedUserCommand[4]);
+		}	
+		else if(parsedUserCommand[0].equalsIgnoreCase("teach")&& parsedUserCommand.length == 3){
+			teach(parsedUserCommand[1], parsedUserCommand[2]);
+		}
+		else if (parsedUserCommand[0].equalsIgnoreCase("list")) {
+			list();
 		}
 		return true;
 	}
@@ -21,6 +32,18 @@ public class ExpertSystemShell {
 	 *This command teaches the system a new variable of the form variable = string.
 	 */
 	private boolean teach(String arg, String var, String expression){
+		System.out.println("arg: "+arg+" var: "+var+" exp "+expression);
+		boolean isRoot = false;
+		if (arg.equalsIgnoreCase("R")) {
+			isRoot = true;
+		}
+		Variable newVar = new Variable(isRoot, var, expression);
+		knownFacts.put(newVar, true); //need to look up specified behaviour here
+		
+		newVar = new Variable();
+		newVar.setName(var);
+		
+		System.out.println("Was the value added to the database: "+knownFacts.get(newVar));
 		return true;
 	}
 	
@@ -42,6 +65,9 @@ public class ExpertSystemShell {
 	 * Lists out all of the fact and rules currently known by the system.
 	 */
 	private String list() {
+		for(Map.Entry<Variable, Boolean> entry: knownFacts.entrySet()){
+			System.out.println("The value of: "+entry.getKey().getName()+" is: "+entry.getValue());
+		}
 		return "";
 	}
 	
@@ -65,65 +91,11 @@ public class ExpertSystemShell {
 		ExpertSystemShell program = new ExpertSystemShell();
 		//get user commands
 		Scanner in = new Scanner(System.in);
-		while(true){ //would normally have an exit condition here, but I see none listed in the assignment
+		while(true){
 			String userCommand = in.nextLine();
-			program.exec(userCommand);
+			String[] parsedUserCommand = userCommand.split("\\W");
+			System.out.println("Command length: "+parsedUserCommand.length+" First token: "+parsedUserCommand[0]);
+			program.exec(parsedUserCommand);
 		}
 	}
-}
-
-
-class TreeNode
-{
-   private Object value; 
-   private ArrayList<TreeNode> children;
-   
-   public TreeNode(Object initValue)
-   { 
-      value = initValue; 
-      ArrayList<TreeNode> children = new ArrayList<TreeNode>(); 
-   }
-   
-   public TreeNode(Object initValue, TreeNode initLeft, TreeNode initRight)
-   { 
-      value = initValue; 
-      children.add(initLeft);
-      children.add(initRight);
-   }
-   
-   public TreeNode(Object initValue, TreeNode initSingle)
-   { 
-      value = initValue; 
-      children.add(initSingle);
-   }
-   
-   public Object getValue()
-   { 
-      return value; 
-   }
-   
-   public TreeNode getLeft() 
-   { 
-      return children.get(0); 
-   }
-   
-   public TreeNode getRight() 
-   { 
-      return children.get(1); 
-   }
-   
-   public void setValue(Object theNewValue) 
-   { 
-      value = theNewValue; 
-   }
-   
-   public void setLeft(TreeNode theNewLeft) 
-   { 
-      children.set(0, theNewLeft);
-   }
-   
-   public void setRight(TreeNode theNewRight)
-   { 
-      children.set(1, theNewRight);
-   }
 }

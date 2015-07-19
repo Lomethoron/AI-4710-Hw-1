@@ -249,11 +249,11 @@ public class ExpertSystemShell {
 	  parse(exp);
       String parsed = parse(exp);
       if(returnBoolean&&expRef.length()>1){//if the connection is true, and is not a simply a truth lookup
-         latestReasoning = latestReasoning + "I THUS KNOW THAT (" + parsed + ")\n";
-		 System.out.println("I THUS KNOW THAT (" + parsed + ")");
+         latestReasoning = latestReasoning + "I THUS KNOW THAT " + parsed + "\n";
+		 //System.out.println("I THUS KNOW THAT (" + parsed + ")");
 	  }
       else if(!returnBoolean&&expRef.length()>1){
-         latestReasoning = latestReasoning + "THUS I CANNOT PROVE (" + parsed + ")\n";
+         latestReasoning = latestReasoning + "THUS I CANNOT PROVE " + parsed + "\n";
 		 //System.out.println("THUS I CANNOT PROVE (" + parsed + ")");
 	  }
       return returnBoolean;
@@ -291,7 +291,7 @@ public class ExpertSystemShell {
    {
       char letter = ("" + root.getValue()).charAt(0);
       if(Character.isLetter(letter)) {
-		 System.out.println("root.getValue() "+ root.getValue());
+		 //System.out.println("root.getValue() "+ root.getValue());
          return trueOrFalse("" + root.getValue());
 	  }
       else if("|".equals("" + root.getValue()))
@@ -307,14 +307,14 @@ public class ExpertSystemShell {
 	   for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
          String key = entry.getKey();
          Variable value = entry.getValue();
-         System.out.println("Key: "+key+" Symbol: "+symbol+" State: "+value.getState());
-		 System.out.println("First Condition: "+(key.equals(symbol)&&value.getState()));
+         //System.out.println("Key: "+key+" Symbol: "+symbol+" State: "+value.getState());
+		 //System.out.println("First Condition: "+(key.equals(symbol)&&value.getState()));
          if(key.equals(symbol)&&value.getState()){ 
             latestReasoning = latestReasoning + "I KNOW THAT " + value.getExpression() + "\n";
-			System.out.println("I KNOW THAT " + value.getExpression());
+			//System.out.println("I KNOW THAT " + value.getExpression());
             return true; //base case
          }
-		 System.out.println("Second Condition: " + (key.equals(symbol)&&!value.getState()));
+		 //System.out.println("Second Condition: " + (key.equals(symbol)&&!value.getState()));
 		 if(key.equals(symbol)&&!value.getState()) {
 			 for(Rule rule: knownRules) {
                String implicant = rule.getVar();
@@ -324,20 +324,20 @@ public class ExpertSystemShell {
 				  //recurse into a new expression
 				  if(isExpTrue){
 					  latestReasoning += "BECAUSE " + parse(expression) + " I KNOW THAT "+ parse(implicant);
-					  System.out.println("BECAUSE " + parse(expression)+ " I KNOW THAT "+ parse(implicant));
+					  //System.out.println("BECAUSE " + parse(expression)+ " I KNOW THAT "+ parse(implicant));
 					  //tokenize(expression);
 					  return true;
 				  }
 				  else {
-					  latestReasoning += "BECAUSE IT IS NOT TRUE THAT" + parse(expression) + " I CANNOT PROVE "+ parse(implicant);
-					  //System.out.println("BECAUSE IT IS NOT TRUE THAT" + parse(expression)+ " I CANNOT PROVE "+ parse(implicant));
+					  latestReasoning += "BECAUSE IT IS NOT TRUE THAT " + parse(expression) + " I CANNOT PROVE THAT "+ parse(implicant);
+					  //System.out.println("BECAUSE IT IS NOT TRUE THAT " + parse(expression)+ " I CANNOT PROVE THAT "+ parse(implicant));
 					  //tokenize(expression);
 					  return false;
 				  }
                }
             }
 			 latestReasoning += "I KNOW IT IS NOT TRUE THAT " + value.getExpression() + "\n";
-			 System.out.println("I KNOW IT IS NOT TRUE THAT " + value.getExpression());
+			 //System.out.println("I KNOW IT IS NOT TRUE THAT " + value.getExpression());
 			 return false;
 		 }
 	   }

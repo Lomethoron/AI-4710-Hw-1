@@ -4,6 +4,7 @@ public class ExpertSystemShell {
 	
 	private HashMap<String, Variable> knownFacts;
 	private ArrayList<Rule> knownRules;
+   private String latestReasoning = "";
 	
 	public ExpertSystemShell() {
 		knownFacts = new HashMap<String, Variable>();
@@ -238,9 +239,37 @@ public class ExpertSystemShell {
    
    public boolean tokenize(String exp)
    {
+      boolean returnBoolean;
       if(exp.contains("|") || exp.contains("&") || exp.contains("!"))
-         return solveTree(treeify(exp));
-      return solveTree(new TreeNode(exp));
+         returnBoolean = solveTree(treeify(exp));
+      returnBoolean = solveTree(new TreeNode(exp));
+      String parsed = "";
+      while (exp.length()>0)
+      {
+         String character = exp.substring(0,1);
+         if(character.equals("&"))
+            parsed = parsed + " ADD ";
+         else if(character.equals("|"))
+            parsed = parsed + " OR ";
+         else if(character.equals("!"))
+            parsed = parsed + " NOT ";
+         else if(character.equals("("))
+            parsed = parsed + " ( ";
+         else if(character.equals(")"))
+            parsed = parsed + " ) ";
+         else
+            for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
+               String key = entry.getKey();
+               Variable value = entry.getValue();
+               if(character.equals(entry.getKey()))
+                  parsed = parsed + entry.getValue();
+            }
+      }
+      if(returnBoolean == true)
+         latestReasoning = latestReasoning + "I THUS KNOW THAT (" + parsed + ")";
+      else
+         latestReasoning = latestReasoning + "THUS I CANNOT PROVE (" + parsed + ")";
+      return returnBoolean;
    }   
   
    public boolean solveTree(TreeNode root)
@@ -259,25 +288,35 @@ public class ExpertSystemShell {
    public boolean trueOrFalse(String symbol)
    {
 	   for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
-		   String key = entry.getKey();
-		   Variable value = entry.getValue();
-		   //System.out.println("Key: " +key+ " Symbol: "+symbol);
-		   //System.out.println("This symbol is: "+ value.getState());
-		   if(key.equals(symbol)&&value.getState()) return true; //base case
-		   else {
-			   for(Rule rule: knownRules) {
-				   String implicant = rule.getVar();
-				   String expression = rule.getExpression();
-				   if(implicant.equals(symbol)) {
-					   return tokenize(expression); //recurse? into a new expression
-				   }
-			   }
-			   //all variables should be known and this should never be encountered		   
-		   }		
-	   }
-	   throw new RuntimeException("Unknown Variable \""+symbol+"\" encountered: program halting.");
+         String key = entry.getKey();
+         Variable value = entry.getValue();
+         
+         if(key.equals(symbol)&&value.getState()){ 
+            latestReasoning = latestReasoning + "I KNOW THAT " + value.getExpression() + "\n";
+            return true; //base case
+         }
+         else {
+            for(Rule rule: knownRules) {
+               String implicant = rule.getVar();
+               String expression = rule.getExpression();
+               if(implicant.equals(symbol)) {
+                  latestReasoning = latestReasoning + "BECAUSE " + value.getExpression() + " ";
+                  return tokenize(expression); //recurse? into a new expression
+               }
+            }
+            //all variables should be known and this should never be encountered
+            throw new RuntimeException("Unknown Variable \""+symbol+"\" encountered: program halting.");			   
+         }
       
-      //return false;
+      }
+      /*String upper = symbol.toUpperCase();
+      if(upper.equals(symbol))
+         return true;*/
+      for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
+         if(symbol.equals(entry.getKey()))
+            latestReasoning = latestReasoning + "I KNOW IT IS NOT TRUE THAT " + entry.getValue() + "/n";
+      }
+      return false;
    }
 	
 	public static void main(String args[]){

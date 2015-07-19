@@ -3,9 +3,11 @@ import java.util.*;
 public class ExpertSystemShell {
 	
 	private HashMap<String, Variable> knownFacts;
+	private ArrayList<Rule> knownRules;
 	
 	public ExpertSystemShell() {
 		knownFacts = new HashMap<String, Variable>();
+		knownRules = new ArrayList<Rule>();
 	}
 	
 	//determines which command to run
@@ -25,7 +27,6 @@ public class ExpertSystemShell {
 				String varAndExpressionSubstring = userCommand.substring(9); //trim off the front of the string
 				String[] varAndExpressionSplit = varAndExpressionSubstring.split(" = ");
 				varAndExpressionSplit[1] = varAndExpressionSplit[1].substring(1,varAndExpressionSplit[1].length()-1); //remove the quotations
-				System.out.println("a"+varAndExpressionSplit[0]+"a");
 				
 				Variable newVar = new Variable(isRoot, varAndExpressionSplit[0], varAndExpressionSplit[1], false);
 				knownFacts.put(varAndExpressionSplit[0], newVar);
@@ -33,16 +34,16 @@ public class ExpertSystemShell {
 			//second teach command
 			else if(userCommand.contains("=")){
 				String varAndExpressionSubstring = userCommand.substring(6);
-				//System.out.println(varAndExpressionSubstring);
 				String[] varAndExpressionSplit = varAndExpressionSubstring.split(" = ");
-				//System.out.println("a"+varAndExpressionSplit[1]+"a");
 				teach(varAndExpressionSplit[0], Boolean.parseBoolean(varAndExpressionSplit[1]));
 				
 				
 			}
 			//final teach command
 			else {
-				
+				String varAndExpressionSubstring = userCommand.substring(6);
+				String[] varAndExpressionSplit = varAndExpressionSubstring.split(" -> ");
+				teach(varAndExpressionSplit[0], varAndExpressionSplit[1]);
 			}
 		}	
 		else if (parsedUserCommand[0].equalsIgnoreCase("list")) {
@@ -74,7 +75,7 @@ public class ExpertSystemShell {
 	 *Teaches the system that a defined root variable has been observed to be true(or false). 
 	 */
 	private boolean teach(String var, boolean truth) {
-		System.out.println(truth);
+		//System.out.println(truth);
 		Variable editVar = knownFacts.get(var);
 		editVar.setState(truth);
 		knownFacts.put(var, editVar);
@@ -85,7 +86,8 @@ public class ExpertSystemShell {
 	 *Teaches  the system  a  new  rule.
 	 */
 	private boolean teach(String expression, String var) {
-		
+		Rule newRule = new Rule(expression, var);
+		knownRules.add(newRule);
 		return true;
 	}
 	
@@ -93,8 +95,27 @@ public class ExpertSystemShell {
 	 * Lists out all of the fact and rules currently known by the system.
 	 */
 	private String list() {
+		System.out.println("Root Variables:");
 		for(Map.Entry<String, Variable> entry: knownFacts.entrySet()){
-			System.out.println("The value of: "+entry.getKey()+" is: "+entry.getValue().getExpression()+" and is currently: "+entry.getValue().getState());
+			if(entry.getValue().getIsRoot()){
+				System.out.println("\t"+entry.getKey()+" = \""+entry.getValue().getExpression()+"\"");
+			}
+		}
+		System.out.println("Learned Variables:");
+		for(Map.Entry<String, Variable> entry: knownFacts.entrySet()){
+			if(!entry.getValue().getIsRoot()){
+				System.out.println("\t"+entry.getKey()+" = \""+entry.getValue().getExpression()+"\"");
+			}
+		}
+		System.out.println("Facts:");
+		for(Map.Entry<String, Variable> entry: knownFacts.entrySet()){
+			if(entry.getValue().getState()){
+				System.out.println("\t"+entry.getKey());
+			}
+		}
+		System.out.println("Rules:");
+		for(Rule rule: knownRules){
+			System.out.println("\t"+rule.getExpression()+" -> "+rule.getVar());
 		}
 		return "";
 	}
@@ -112,6 +133,10 @@ public class ExpertSystemShell {
 	 *true given the rules and facts within the system.
 	 */
 	private String query(String exp){
+		return "";
+	}
+	
+	private String why(String exp){
 		return "";
 	}
 	

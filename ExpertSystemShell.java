@@ -55,6 +55,9 @@ public class ExpertSystemShell {
 		else if (parsedUserCommand[0].equalsIgnoreCase("query")) {
 			query(parsedUserCommand[1]);
 		}
+		else if (parsedUserCommand[0].equalsIgnoreCase("why")) {
+			why(parsedUserCommand[1]);
+		}
 		return true;
 	}
 	
@@ -150,12 +153,15 @@ public class ExpertSystemShell {
 	 *true given the rules and facts within the system.
 	 */
 	private String query(String exp){
+		tokenize(exp);
 		return "";
 	}
 	/**
 	 *the ‘Why’ command explains the reasoning behind the true or false claim to the user.
 	 */
 	private String why(String exp){
+		query(exp);
+		//System.out.println(latestReasoning);
 		return "";
 	}
 	
@@ -255,7 +261,8 @@ public class ExpertSystemShell {
 	   for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
 		   String key = entry.getKey();
 		   Variable value = entry.getValue();
-		   
+		   //System.out.println("Key: " +key+ " Symbol: "+symbol);
+		   //System.out.println("This symbol is: "+ value.getState());
 		   if(key.equals(symbol)&&value.getState()) return true; //base case
 		   else {
 			   for(Rule rule: knownRules) {
@@ -265,15 +272,12 @@ public class ExpertSystemShell {
 					   return tokenize(expression); //recurse? into a new expression
 				   }
 			   }
-			   //all variables should be known and this should never be encountered
-			   throw new RuntimeException("Unknown Variable \""+symbol+"\" encountered: program halting.");			   
-		   }
-		
+			   //all variables should be known and this should never be encountered		   
+		   }		
 	   }
-      /*String upper = symbol.toUpperCase();
-      if(upper.equals(symbol))
-         return true;*/
-      return false;
+	   throw new RuntimeException("Unknown Variable \""+symbol+"\" encountered: program halting.");
+      
+      //return false;
    }
 	
 	public static void main(String args[]){

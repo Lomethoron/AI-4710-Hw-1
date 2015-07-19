@@ -155,7 +155,7 @@ public class ExpertSystemShell {
 	 *true given the rules and facts within the system.
 	 */
 	private String query(String exp){
-		System.out.print(tokenize(exp));
+		System.out.println(tokenize(exp));
 		return "";
 	}
 	/**
@@ -293,7 +293,7 @@ public class ExpertSystemShell {
 	   for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
          String key = entry.getKey();
          Variable value = entry.getValue();
-         //System.out.println("Key: "+key+" Symbol: "+symbol+" State: "+value.getState());
+         System.out.println("Key: "+key+" Symbol: "+symbol+" State: "+value.getState());
          if(key.equals(symbol)&&value.getState()){ 
             latestReasoning = latestReasoning + "I KNOW THAT " + value.getExpression() + "\n";
             return true; //base case

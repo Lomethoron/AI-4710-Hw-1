@@ -129,8 +129,10 @@ public class ExpertSystemShell {
 			//for every rule
 			for(Rule rule: knownRules) {
 				String ruleExp = rule.getExpression();
+				String ruleVar = rule.getVar();
 				//see if I know new things
-				if(tokenize(ruleExp)){
+				//if the expression is true, and not already known to be true
+				if(tokenize(ruleExp)&&!knownFacts.get(ruleVar).getState()){
 					String varName = rule.getVar();
 					System.out.println(varName);
 					Variable editFact = knownFacts.get(varName);
@@ -263,6 +265,7 @@ public class ExpertSystemShell {
 					   return tokenize(expression); //recurse? into a new expression
 				   }
 			   }
+			   //all variables should be known and this should never be encountered
 			   throw new RuntimeException("Unknown Variable \""+symbol+"\" encountered: program halting.");			   
 		   }
 		

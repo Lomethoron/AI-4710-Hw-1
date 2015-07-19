@@ -63,6 +63,16 @@ public class ExpertSystemShell {
 	 *Teaches the system that a defined root variable has been observed to be true(or false). 
 	 */
 	private boolean teach(String var, boolean truth) {//YOU CANT HANDLE THE TRUTH
+		//we may assume that all learned variables are reset to false when we call this command
+		for(Map.Entry<String,Variable> entry : knownFacts.entrySet()){
+			String key = entry.getKey();
+			Variable value = entry.getValue();
+			
+			if (!value.getIsRoot()) {
+				value.setState(false);
+				knownFacts.put(key,value);
+			}
+		}
 		Variable editVar = knownFacts.get(var);
 		editVar.setState(truth);
 		knownFacts.put(var, editVar);
@@ -112,6 +122,24 @@ public class ExpertSystemShell {
 	 *the facts of the system to create newly formed facts.
 	 */
 	private String learn() {
+		boolean canLearnMore;
+		//while changes are being made
+		 do {
+			canLearnMore = false;
+			//for every rule
+			for(Rule rule: knownRules) {
+				String ruleExp = rule.getExpression();
+				//see if I know new things
+				if(tokenize(ruleExp)){
+					String varName = rule.getVar();
+					System.out.println(varName);
+					Variable editFact = knownFacts.get(varName);
+					editFact.setState(true);
+					knownFacts.put(varName, editFact);
+					canLearnMore = true;
+				}
+			}
+		} while(canLearnMore);
 		return "";
 	}
 	

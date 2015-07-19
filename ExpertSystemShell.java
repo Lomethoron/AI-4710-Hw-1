@@ -129,6 +129,7 @@ public class ExpertSystemShell {
 		boolean canLearnMore;
 		//while changes are being made
 		 do {
+			 //System.out.println("whee");
 			canLearnMore = false;
 			//for every rule
 			for(Rule rule: knownRules) {
@@ -242,13 +243,14 @@ public class ExpertSystemShell {
       boolean returnBoolean;
       if(exp.contains("|") || exp.contains("&") || exp.contains("!"))
          returnBoolean = solveTree(treeify(exp));
-      returnBoolean = solveTree(new TreeNode(exp));
+      else returnBoolean = solveTree(new TreeNode(exp));
       String parsed = "";
       while (exp.length()>0)
       {
+		  //System.out.println("whee");
          String character = exp.substring(0,1);
          if(character.equals("&"))
-            parsed = parsed + " ADD ";
+            parsed = parsed + " AND ";
          else if(character.equals("|"))
             parsed = parsed + " OR ";
          else if(character.equals("!"))
@@ -262,8 +264,9 @@ public class ExpertSystemShell {
                String key = entry.getKey();
                Variable value = entry.getValue();
                if(character.equals(entry.getKey()))
-                  parsed = parsed + entry.getValue();
+                  parsed = parsed + entry.getValue().getExpression();
             }
+		exp = exp.substring(1);
       }
       if(returnBoolean == true)
          latestReasoning = latestReasoning + "I THUS KNOW THAT (" + parsed + ")";
@@ -290,7 +293,7 @@ public class ExpertSystemShell {
 	   for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
          String key = entry.getKey();
          Variable value = entry.getValue();
-         System.out.println("Key: "+key+" Symbol: "+symbol+" State: "+value.getState());
+         //System.out.println("Key: "+key+" Symbol: "+symbol+" State: "+value.getState());
          if(key.equals(symbol)&&value.getState()){ 
             latestReasoning = latestReasoning + "I KNOW THAT " + value.getExpression() + "\n";
             return true; //base case

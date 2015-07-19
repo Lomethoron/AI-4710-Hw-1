@@ -162,6 +162,7 @@ public class ExpertSystemShell {
 	 *the ‘Why’ command explains the reasoning behind the true or false claim to the user.
 	 */
 	private String why(String exp){
+		latestReasoning = "";
 		query(exp);
 		System.out.println(latestReasoning);
 		return "";
@@ -241,11 +242,26 @@ public class ExpertSystemShell {
    public boolean tokenize(String exp)
    {
       boolean returnBoolean;
+	  String expRef = exp;
       if(exp.contains("|") || exp.contains("&") || exp.contains("!"))
          returnBoolean = solveTree(treeify(exp));
       else returnBoolean = solveTree(new TreeNode(exp));
-      String parsed = "";
-      while (exp.length()>0)
+	  parse(exp);
+      String parsed = parse(exp);
+      if(returnBoolean&&expRef.length()>1){//if the connection is true, and is not a simply a truth lookup
+         latestReasoning = latestReasoning + "I THUS KNOW THAT (" + parsed + ")\n";
+		 System.out.println("I THUS KNOW THAT (" + parsed + ")");
+	  }
+      else if(!returnBoolean&&expRef.length()>1){
+         latestReasoning = latestReasoning + "THUS I CANNOT PROVE (" + parsed + ")\n";
+		 //System.out.println("THUS I CANNOT PROVE (" + parsed + ")");
+	  }
+      return returnBoolean;
+   } 
+	
+	public String parse(String exp){
+		String parsed = "";
+		while (exp.length()>0)
       {
 		  //System.out.println("whee");
          String character = exp.substring(0,1);
@@ -268,18 +284,16 @@ public class ExpertSystemShell {
             }
 		exp = exp.substring(1);
       }
-      if(returnBoolean == true)
-         latestReasoning = latestReasoning + "I THUS KNOW THAT (" + parsed + ")";
-      else
-         latestReasoning = latestReasoning + "THUS I CANNOT PROVE (" + parsed + ")";
-      return returnBoolean;
-   }   
+	  return parsed;
+	}
   
    public boolean solveTree(TreeNode root)
    {
       char letter = ("" + root.getValue()).charAt(0);
-      if(Character.isLetter(letter))
+      if(Character.isLetter(letter)) {
+		 System.out.println("root.getValue() "+ root.getValue());
          return trueOrFalse("" + root.getValue());
+	  }
       else if("|".equals("" + root.getValue()))
          return solveTree(root.getLeft()) || solveTree(root.getRight());
       else if("&".equals("" + root.getValue()))
@@ -294,36 +308,40 @@ public class ExpertSystemShell {
          String key = entry.getKey();
          Variable value = entry.getValue();
          System.out.println("Key: "+key+" Symbol: "+symbol+" State: "+value.getState());
+		 System.out.println("First Condition: "+(key.equals(symbol)&&value.getState()));
          if(key.equals(symbol)&&value.getState()){ 
             latestReasoning = latestReasoning + "I KNOW THAT " + value.getExpression() + "\n";
+			System.out.println("I KNOW THAT " + value.getExpression());
             return true; //base case
          }
-		 else if(key.equals(symbol)&&!value.getState()) {
-			 latestReasoning += "I KNOW IT IS NOT TRUE THAT " + value.getExpression() + "\n";
-			 return false;
-		 }
-         else {
-            for(Rule rule: knownRules) {
+		 System.out.println("Second Condition: " + (key.equals(symbol)&&!value.getState()));
+		 if(key.equals(symbol)&&!value.getState()) {
+			 for(Rule rule: knownRules) {
                String implicant = rule.getVar();
                String expression = rule.getExpression();
                if(implicant.equals(symbol)) {
                   boolean isExpTrue = tokenize(expression);
 				  //recurse into a new expression
 				  if(isExpTrue){
-					  latestReasoning += "BECAUSE " + value.getExpression() + " ";
+					  latestReasoning += "BECAUSE " + parse(expression) + " ";
+					  System.out.println("BECAUSE " + parse(expression));
 					  //tokenize(expression);
 					  return true;
 				  }
 				  else {
-					  latestReasoning += "BECAUSE IT IS NOT TRUE THAT" + value.getExpression() + " ";
+					  latestReasoning += "BECAUSE IT IS NOT TRUE THAT" + parse(expression) + " ";
+					  //System.out.println("BECAUSE IT IS NOT TRUE THAT" + parse(expression));
 					  //tokenize(expression);
 					  return false;
 				  }
                }
             }
-         }
+			 latestReasoning += "I KNOW IT IS NOT TRUE THAT " + value.getExpression() + "\n";
+			 System.out.println("I KNOW IT IS NOT TRUE THAT " + value.getExpression());
+			 return false;
+		 }
+	   }
       
-      }
 	  //all variables should be known and this should never be encountered	
 	  throw new RuntimeException("Unknown Variable \""+symbol+"\" encountered: program halting.");	
       /*for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {

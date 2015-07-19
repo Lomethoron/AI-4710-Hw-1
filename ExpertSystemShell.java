@@ -250,9 +250,26 @@ public class ExpertSystemShell {
    
    public boolean trueOrFalse(String symbol)
    {
-      String upper = symbol.toUpperCase();
+	   for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
+		   String key = entry.getKey();
+		   Variable value = entry.getValue();
+		   
+		   if(key.equals(symbol)&&value.getState()) return true; //base case
+		   else {
+			   for(Rule rule: knownRules) {
+				   String implicant = rule.getVar();
+				   String expression = rule.getExpression();
+				   if(implicant.equals(symbol)) {
+					   return tokenize(expression); //recurse? into a new expression
+				   }
+			   }
+			   throw new RuntimeException("Unknown Variable \""+symbol+"\" encountered: program halting.");			   
+		   }
+		
+	   }
+      /*String upper = symbol.toUpperCase();
       if(upper.equals(symbol))
-         return true;
+         return true;*/
       return false;
    }
 	
@@ -262,7 +279,6 @@ public class ExpertSystemShell {
 		Scanner in = new Scanner(System.in);
 		while(true){
 			String userCommand = in.nextLine();
-			//System.out.println("Command length: "+parsedUserCommand.length+" First token: "+parsedUserCommand[0]);
 			program.exec(userCommand);
 		}
 	}

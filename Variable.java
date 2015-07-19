@@ -19,7 +19,6 @@ public class Variable {
 	 */
 	 @Override
 	public int hashCode() {
-		System.out.println("Does hasCode() get called?");
 		return name.hashCode();
 	}
 	
@@ -28,9 +27,7 @@ public class Variable {
 	 */
 	 @Override
 	public boolean equals(Object obj) {
-		System.out.println("Have I redefined .equals()? What is obj: "+obj+ " What is name: "+name);
 		Variable otherVar = (Variable) obj;
-		System.out.println("otherVar name: "+otherVar);
 		return name.equals(otherVar.getName());
 	}
 	

@@ -2,7 +2,7 @@ import java.util.*;
 
 public class ExpertSystemShell {
 	
-	private HashMap<Variable, Boolean> knownFacts;
+	private HashMap<Variable, Boolean> knownFacts; // in retrospect this is really stupid, it should be <String (name), Variable (var)>
 	
 	public ExpertSystemShell() {
 		knownFacts = new HashMap<Variable, Boolean>();
@@ -16,14 +16,22 @@ public class ExpertSystemShell {
 		}
 		//for teach -args..., the dash is treated as its own place to break the string using .split(), this makes these numbers 1 larger than one might think
 		else if (parsedUserCommand[0].equalsIgnoreCase("teach")&& parsedUserCommand.length == 5) {
-			System.out.println("Big teach triggered");
 			teach(parsedUserCommand[2], parsedUserCommand[3], parsedUserCommand[4]);
 		}	
-		else if(parsedUserCommand[0].equalsIgnoreCase("teach")&& parsedUserCommand.length == 3){
+		else if(parsedUserCommand[0].equalsIgnoreCase("teach")&& (parsedUserCommand[2].equalsIgnoreCase("true")||parsedUserCommand[2].equalsIgnoreCase("false"))){
+			teach(parsedUserCommand[1], Boolean.parseBoolean(parsedUserCommand[2]));
+		}
+		else if(parsedUserCommand[0].equalsIgnoreCase("teach")){
 			teach(parsedUserCommand[1], parsedUserCommand[2]);
 		}
 		else if (parsedUserCommand[0].equalsIgnoreCase("list")) {
 			list();
+		}
+		else if (parsedUserCommand[0].equalsIgnoreCase("learn")) {
+			learn();
+		}
+		else if (parsedUserCommand[0].equalsIgnoreCase("query")) {
+			query(parsedUserCommand[1]);
 		}
 		return true;
 	}
@@ -32,18 +40,12 @@ public class ExpertSystemShell {
 	 *This command teaches the system a new variable of the form variable = string.
 	 */
 	private boolean teach(String arg, String var, String expression){
-		System.out.println("arg: "+arg+" var: "+var+" exp "+expression);
 		boolean isRoot = false;
-		if (arg.equalsIgnoreCase("R")) {
+		if (arg.equalsIgnoreCase("r")) {
 			isRoot = true;
 		}
 		Variable newVar = new Variable(isRoot, var, expression);
 		knownFacts.put(newVar, true); //need to look up specified behaviour here
-		
-		newVar = new Variable();
-		newVar.setName(var);
-		
-		System.out.println("Was the value added to the database: "+knownFacts.get(newVar));
 		return true;
 	}
 	
@@ -51,13 +53,20 @@ public class ExpertSystemShell {
 	 *Teaches the system that a defined root variable has been observed to be true(or false). 
 	 */
 	private boolean teach(String var, boolean truth) {
-		return true;
+		for(Map.Entry<Variable, Boolean> entry: knownFacts.entrySet()){ //need to grab the entire key object
+			if(var.equals(entry.getKey().getName())) {
+				knownFacts.put(entry.getKey(), truth);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
 	 *Teaches  the system  a  new  rule.
 	 */
 	private boolean teach(String expression, String var) {
+		
 		return true;
 	}
 	
@@ -94,7 +103,7 @@ public class ExpertSystemShell {
 		while(true){
 			String userCommand = in.nextLine();
 			String[] parsedUserCommand = userCommand.split("\\W");
-			System.out.println("Command length: "+parsedUserCommand.length+" First token: "+parsedUserCommand[0]);
+			//System.out.println("Command length: "+parsedUserCommand.length+" First token: "+parsedUserCommand[0]);
 			program.exec(parsedUserCommand);
 		}
 	}

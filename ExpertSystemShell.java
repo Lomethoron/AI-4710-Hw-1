@@ -323,14 +323,14 @@ public class ExpertSystemShell {
                   boolean isExpTrue = tokenize(expression);
 				  //recurse into a new expression
 				  if(isExpTrue){
-					  latestReasoning += "BECAUSE " + parse(expression) + " ";
-					  System.out.println("BECAUSE " + parse(expression));
+					  latestReasoning += "BECAUSE " + parse(expression) + " I KNOW THAT "+ parse(implicant);
+					  System.out.println("BECAUSE " + parse(expression)+ " I KNOW THAT "+ parse(implicant));
 					  //tokenize(expression);
 					  return true;
 				  }
 				  else {
-					  latestReasoning += "BECAUSE IT IS NOT TRUE THAT" + parse(expression) + " ";
-					  //System.out.println("BECAUSE IT IS NOT TRUE THAT" + parse(expression));
+					  latestReasoning += "BECAUSE IT IS NOT TRUE THAT" + parse(expression) + " I CANNOT PROVE "+ parse(implicant);
+					  //System.out.println("BECAUSE IT IS NOT TRUE THAT" + parse(expression)+ " I CANNOT PROVE "+ parse(implicant));
 					  //tokenize(expression);
 					  return false;
 				  }

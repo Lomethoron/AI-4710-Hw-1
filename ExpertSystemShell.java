@@ -154,7 +154,7 @@ public class ExpertSystemShell {
 	 *true given the rules and facts within the system.
 	 */
 	private String query(String exp){
-		tokenize(exp);
+		System.out.print(tokenize(exp));
 		return "";
 	}
 	/**
@@ -162,7 +162,7 @@ public class ExpertSystemShell {
 	 */
 	private String why(String exp){
 		query(exp);
-		//System.out.println(latestReasoning);
+		System.out.println(latestReasoning);
 		return "";
 	}
 	
@@ -290,33 +290,44 @@ public class ExpertSystemShell {
 	   for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
          String key = entry.getKey();
          Variable value = entry.getValue();
-         
+         System.out.println("Key: "+key+" Symbol: "+symbol+" State: "+value.getState());
          if(key.equals(symbol)&&value.getState()){ 
             latestReasoning = latestReasoning + "I KNOW THAT " + value.getExpression() + "\n";
             return true; //base case
          }
+		 else if(key.equals(symbol)&&!value.getState()) {
+			 latestReasoning += "I KNOW IT IS NOT TRUE THAT " + value.getExpression() + "\n";
+			 return false;
+		 }
          else {
             for(Rule rule: knownRules) {
                String implicant = rule.getVar();
                String expression = rule.getExpression();
                if(implicant.equals(symbol)) {
-                  latestReasoning = latestReasoning + "BECAUSE " + value.getExpression() + " ";
-                  return tokenize(expression); //recurse? into a new expression
+                  boolean isExpTrue = tokenize(expression);
+				  //recurse into a new expression
+				  if(isExpTrue){
+					  latestReasoning += "BECAUSE " + value.getExpression() + " ";
+					  //tokenize(expression);
+					  return true;
+				  }
+				  else {
+					  latestReasoning += "BECAUSE IT IS NOT TRUE THAT" + value.getExpression() + " ";
+					  //tokenize(expression);
+					  return false;
+				  }
                }
             }
-            //all variables should be known and this should never be encountered
-            throw new RuntimeException("Unknown Variable \""+symbol+"\" encountered: program halting.");			   
          }
       
       }
-      /*String upper = symbol.toUpperCase();
-      if(upper.equals(symbol))
-         return true;*/
-      for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
+	  //all variables should be known and this should never be encountered	
+	  throw new RuntimeException("Unknown Variable \""+symbol+"\" encountered: program halting.");	
+      /*for(Map.Entry<String, Variable> entry : knownFacts.entrySet()) {
          if(symbol.equals(entry.getKey()))
             latestReasoning = latestReasoning + "I KNOW IT IS NOT TRUE THAT " + entry.getValue() + "/n";
-      }
-      return false;
+      }*/
+      //return false;
    }
 	
 	public static void main(String args[]){

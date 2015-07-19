@@ -135,7 +135,9 @@ public class ExpertSystemShell {
 	private String query(String exp){
 		return "";
 	}
-	
+	/**
+	 *the ‘Why’ command explains the reasoning behind the true or false claim to the user.
+	 */
 	private String why(String exp){
 		return "";
 	}

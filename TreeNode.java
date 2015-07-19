@@ -1,42 +1,25 @@
-import java.util.*;
-
 class TreeNode
 {
    private Object value; 
    private ArrayList<TreeNode> children;
    
-   /**
-	*Default Constructor
-	*/
-   public TreeNode() {
-	   value = null;
-	   children = new ArrayList<TreeNode>();
-   }
-   
-   /**
-    * Constructor from expression alone
-	*/
    public TreeNode(Object initValue)
    { 
       value = initValue; 
       children = new ArrayList<TreeNode>(); 
    }
    
-   /**
-	*Constructor from expression and children
-	*/
    public TreeNode(Object initValue, TreeNode initLeft, TreeNode initRight)
    { 
+      children = new ArrayList<TreeNode>();
       value = initValue; 
       children.add(initLeft);
       children.add(initRight);
    }
    
-   /**
-	* Constructor from expression and single children
-	*/
    public TreeNode(Object initValue, TreeNode initSingle)
    { 
+      children = new ArrayList<TreeNode>();
       value = initValue; 
       children.add(initSingle);
    }
@@ -48,12 +31,23 @@ class TreeNode
    
    public TreeNode getLeft() 
    { 
-      return children.get(0); 
+      if(children.size()>0)
+         return children.get(0); 
+      return null;
    }
    
    public TreeNode getRight() 
    { 
-      return children.get(1); 
+      if(children.size()>1)
+         return children.get(1); 
+      return null;
+   }
+   
+   public TreeNode getSingle()
+   {
+      if(children.size()>0)
+         return children.get(0);
+      return null;
    }
    
    public void setValue(Object theNewValue) 
@@ -63,11 +57,15 @@ class TreeNode
    
    public void setLeft(TreeNode theNewLeft) 
    { 
-      children.set(0, theNewLeft);
+      if(children.size()>0)
+         children.set(0, theNewLeft);
+      children.add(theNewLeft);
    }
    
    public void setRight(TreeNode theNewRight)
    { 
-      children.set(1, theNewRight);
+      if(children.size()>0)
+         children.set(1, theNewRight);
+      children.add(theNewRight);
    }
 }

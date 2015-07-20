@@ -70,6 +70,7 @@ public class ExpertSystemShell {
 	 */
 	private boolean teach(String var, boolean truth) {//YOU CANT HANDLE THE TRUTH
 		//we may assume that all learned variables are reset to false when we call this command
+		boolean doesVarExist = false;
 		for(Map.Entry<String,Variable> entry : knownFacts.entrySet()){
 			String key = entry.getKey();
 			Variable value = entry.getValue();
@@ -78,6 +79,14 @@ public class ExpertSystemShell {
 				value.setState(false);
 				knownFacts.put(key,value);
 			}
+			
+			//making sure the variable exists in the first place
+			if(key.equals(var)) {
+				doesVarExist = true;
+			}
+		}
+		if(!doesVarExist) {
+			throw new RuntimeException("The variable: "+var+" does not exist. Program exiting.");
 		}
 		Variable editVar = knownFacts.get(var);
 		editVar.setState(truth);

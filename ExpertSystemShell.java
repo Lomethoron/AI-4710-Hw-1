@@ -172,7 +172,7 @@ public class ExpertSystemShell {
 	
 	public TreeNode treeify(String exp)
    {
-	   System.out.println("Exp: "+exp);
+	   //System.out.println("Exp: "+exp);
       if(!(exp.contains("|") || exp.contains("&") || exp.contains("!")))
          return new TreeNode(exp);
       if(exp.substring(0,1).equals("("))
@@ -246,7 +246,7 @@ public class ExpertSystemShell {
    {
       boolean returnBoolean;
 	  String expRef = exp;
-	   System.out.println("Exp: "+exp);
+	   //System.out.println("Exp: "+exp);
       if(exp.contains("|") || exp.contains("&") || exp.contains("!"))
          returnBoolean = solveTree(treeify(exp));
       else returnBoolean = solveTree(new TreeNode(exp));
@@ -293,7 +293,7 @@ public class ExpertSystemShell {
   
    public boolean solveTree(TreeNode root)
    {
-	  System.out.println("Root value: "+root.getValue());
+	  //System.out.println("Root value: "+root.getValue());
       char letter = ("" + root.getValue()).charAt(0);
       if(Character.isLetter(letter)) {
 		 //System.out.println("root.getValue() "+ root.getValue());
